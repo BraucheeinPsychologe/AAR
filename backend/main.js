@@ -35,10 +35,15 @@ async function loadModule(ModuleName) {
   return moduleObj;
 }
 
-async function runModule(module, command) {
-  const thisModule = await loadModule(module);
-  return await thisModule.commands.ˋ${command}ˋ.handler();
-}
+async function runModule(moduleName, command) {
+  const thisModule = await loadModule(moduleName);
+
+  if (!thisModule) {
+    throw new Error(`Module "${moduleName}" not found`);
+  }
+  if (!thisModule.commands[command]) {
+    throw new Error(`Command "${command}" not found in module "${moduleName}"`);
+  }
 
 async function loadAllModules() {
   const moduleNames = await listModules();
