@@ -78,29 +78,20 @@ Project Structure
 ```
 AAR/
 │
-├── modules/               # Agent modules
+├── modules/           # Agent modules
 │   ├── time.js
 │   ├── battery.js
 │   └── ...
 │
-├── adapters/              # AI model adapters
+├── adapters/      # AI model adapters
 │   ├── chatgpt.js
 │   ├── gemini.js
 │   └── ollama.js
-│
-├── core/
-│   ├── agent.js           # Main agent logic
-│   ├── permissions.js     # Permission and approval system
-│   ├── moduleLoader.js    # Module loading and validation
-│   ├── commandParser.js   # "/run ..." parsing
-│   └── audit.js           # Audit log system
-│
-├── server/
-│   ├── api.js             # Backend API
-│   ├── websocket.js       # Real-time frontend communication
-│   └── auth.js            # Device ID and 2FA logic
-│
-├── frontend/              # Web user interface
+|
+├── backend/      # Backend
+│   └── main.js
+|
+├── frontend/              # Web user 
 │   └── ...
 │
 ├── docker/
