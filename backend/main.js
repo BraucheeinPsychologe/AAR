@@ -35,6 +35,9 @@ async function loadModule(ModuleName) {
   return moduleObj;
 }
 
-const timeModule = await loadModule("time");
+async function runModule(module, command) {
+  const thisModule = await loadModule(module);
+  return await thisModule.commands.ˋ${command}ˋ.handler();
+}
 
-console.log(await timeModule.id);
+runModule("time", "getDate")
