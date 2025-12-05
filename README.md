@@ -1,89 +1,59 @@
-AAR — Another Agent Runtime
+# AAR — Another Agent Runtime
 
-AAR is a modular, secure, and extensible runtime for AI agents.
-The system focuses on control, transparency, and user-approved execution.
-Modules can read device data, trigger actions, or interact with external systems —
+AAR is a modular, secure, and extensible runtime for AI agents.  
+The system focuses on control, transparency, and user-approved execution.  
+Modules can access device data, perform actions, or interact with external systems —  
 but never without explicit user authorization.
 
-AAR enables:
+AAR provides:
 
-Controlled agent execution (sandboxed modules)
-
-User consent and permission-based access
-
-Multiple AI backends (ChatGPT, Gemini, Ollama)
-
-NodeJS-based runtime
-
-A simple and extensible module system
-
-Web frontend for control prompts
-
-Security through device identification, 2FA, and auditing
-
-
+- Controlled execution of agent actions (sandboxed modules)
+- User consent and permission-based access
+- Support for multiple AI backends (ChatGPT, Gemini, Ollama)
+- NodeJS-based runtime
+- A simple and extensible module system
+- Web-based frontend for interaction and approval
+- Device identification, optional 2FA, and full audit logging
 
 ---
 
-Features
+## Features
 
-Modular architecture
+### Modular architecture
+- Modules are plain `.js` files.
+- Each module defines:
+  - ID and name  
+  - Capabilities (READ / READ_WRITE)
+  - Commands
+  - Handler functions
+- Modules can only run after explicit user approval.
 
-Modules are plain .js files.
+### Security-first design
+- User approval required for module activation
+- Optional WebAuthn device binding
+- Optional 2FA (TOTP or WebAuthn)
+- Granular, module-level permissions
+- Full audit log of module usage and agent actions
 
-Each module defines:
+### Pluggable AI backends
+AAR supports multiple model providers via adapters:
 
-Name and ID
+- OpenAI / ChatGPT
+- Google Gemini
+- Ollama (local LLMs)
 
-Capabilities (READ / READ_WRITE)
+Adapters implement a unified interface and can be extended easily.
 
-Commands
+### Web-based frontend
+- Real-time approval pop-ups
+- Module overview and permissions control
+- Command console (`/run ...`)
+- System status and logs
 
-Handler functions
+### Simple module development
+Example module:
 
-
-
-Security-first design
-
-User approval required for every module activation
-
-Optional WebAuthn device verification
-
-Optional TOTP or WebAuthn-based 2FA
-
-Granular permissions per module
-
-Full audit log of all actions
-
-
-Pluggable AI backends
-
-AAR supports multiple AI model providers via adapters:
-
-OpenAI / ChatGPT
-
-Google Gemini
-
-Ollama (local models)
-
-
-Adapters follow a unified API and can be extended easily.
-
-Web-based frontend
-
-Real-time pop-up authorization dialogs
-
-Module overview and access control
-
-Command console (/run ...)
-
-Status dashboard and logs
-
-
-Simple module development
-
-A module example:
-
+```js
 module.exports = {
   id: "time",
   name: "Time Module",
@@ -100,15 +70,15 @@ module.exports = {
     }
   }
 };
-
+```
 
 ---
 
-Project structure
-
+Project Structure
+```
 AAR/
 │
-├── modules/               # All agent modules
+├── modules/               # Agent modules
 │   ├── time.js
 │   ├── battery.js
 │   └── ...
@@ -122,36 +92,36 @@ AAR/
 │   ├── agent.js           # Main agent logic
 │   ├── permissions.js     # Permission and approval system
 │   ├── moduleLoader.js    # Module loading and validation
-│   ├── commandParser.js   # "/run ..." parser
-│   └── audit.js           # Audit log
+│   ├── commandParser.js   # "/run ..." parsing
+│   └── audit.js           # Audit log system
 │
 ├── server/
 │   ├── api.js             # Backend API
-│   ├── websocket.js       # Real-time UI communication
-│   └── auth.js            # Device ID + 2FA
+│   ├── websocket.js       # Real-time frontend communication
+│   └── auth.js            # Device ID and 2FA logic
 │
-├── frontend/              # Web interface
+├── frontend/              # Web user interface
 │   └── ...
 │
 ├── docker/
 │   └── Dockerfile
 │
 └── README.md
-
+```
 
 ---
 
-Command system
+Command System
 
-AAR provides a structured runtime command interface:
+AAR provides a structured command interface accessible via the frontend or API.
 
 List all modules
 
-/run help modules
+> /run help modules
 
-Describe a specific module
+Show information about a specific module
 
-/run help module time
+> /run help module time
 
 Example output:
 
@@ -159,51 +129,78 @@ getTime
 getDate
 getMonth
 
-Execute a command
+Run a module command
 
-/run time.getTime
+> /run time.getTime
 
-If the module has not been authorized yet, the frontend prompts the user.
+If the module has not been authorized yet, the frontend prompts the user for approval.
 
 
 ---
 
-Permission model
+Permission Model
 
-Each module declares its capabilities:
+Modules declare capabilities:
 
-READ – The module may only read or fetch data.
+READ – Module can only read or fetch data
 
-READ_WRITE – The module can perform actions or change states.
+READ_WRITE – Module can perform actions or modify states
 
 
 AAR enforces:
 
-User confirmation before first activation
+User approval before the module can execute
 
-Optional session-based or per-command approval
+Optional per-command or per-session approvals
 
-Revocation at any time
+Revocation of permissions at any time
 
-Audit logs for every access
+Full audit logs for every action
 
 
 
 ---
 
-AI adapters
+AI Adapter Interface
 
 All AI backends implement a common interface:
-
+```js
 class AIAdapter {
-  async generate(systemPrompt, userPrompt) { ... }
+  async generate(systemPrompt, userPrompt) {
+    // Returns the model response
+  }
 }
-
-This allows switching AI models without modifying the agent logic.
+```
+This allows seamless switching of AI providers.
 
 
 ---
 
 Goals
 
-The primary goal of AAR is to provide a controlled, transparent, and extensible runtime for AI agents that can safely interact with devices, data, and environments — always with explicit user oversight.
+AAR aims to provide a transparent, controlled, and extensible runtime for AI agents.
+The system is designed to integrate safely with devices, data sources, and external tools,
+with the user always remaining in full control.
+
+
+---
+
+Future Extensions (Planned)
+
+Role-based permission presets
+
+Secure module signing
+
+Automated tests for modules
+
+Enhanced sandboxing through isolated workers
+
+Native desktop container builds
+
+
+
+---
+
+License
+
+To be added.
