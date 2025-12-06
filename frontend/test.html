@@ -103,6 +103,41 @@
             border-radius: 4px;
             margin: 10px 0;
         }
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .user-message {
+            background-color: #2196f3;
+            color: white;
+            text-align: right;
+        }
+        .ai-message {
+            background-color: #f1f3f4;
+            color: black;
+        }
+        .clear-history-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .clear-history-btn:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -123,6 +158,12 @@
         
         <button type="submit">Send Message</button>
     </form>
+    
+    <div style="margin-bottom: 10px;">
+        <button class="clear-history-btn" onclick="clearHistory()">Clear Chat History</button>
+    </div>
+    
+    <div id="chatContainer" class="chat-container"></div>
     
     <div id="response" class="response" style="display: none;"></div>
     
@@ -145,6 +186,10 @@
     <script>
         let currentRequestId = null;
         let currentFormData = null;
+        let sessionId = 'default'; // Could be enhanced later for multiple sessions
+        
+        // Load chat history on page load
+        window.addEventListener('load', loadChatHistory);
         
         document.getElementById('messageForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -169,7 +214,8 @@
                     },
                     body: JSON.stringify({
                         userprompt: userprompt,
-                        typoftask: typoftask
+                        typoftask: typoftask,
+                        sessionId: sessionId
                     })
                 });
                 
@@ -188,6 +234,11 @@
                 } else if (data.success) {
                     responseDiv.className = 'response';
                     responseDiv.innerHTML = data.message;
+                    
+                    // Update chat history if provided
+                    if (data.history) {
+                        updateChatHistory(data.history);
+                    }
                 } else {
                     responseDiv.className = 'response error';
                     responseDiv.innerHTML = 'Error: ' + data.message;
@@ -244,6 +295,11 @@
                     responseDiv.className = 'response';
                     responseDiv.innerHTML = data.message;
                     currentRequestId = null;
+                    
+                    // Update chat history if provided
+                    if (data.history) {
+                        updateChatHistory(data.history);
+                    }
                 } else {
                     responseDiv.className = 'response error';
                     responseDiv.innerHTML = 'Error: ' + data.message;
@@ -286,6 +342,11 @@
                 if (data.success) {
                     responseDiv.className = 'response';
                     responseDiv.innerHTML = data.message;
+                    
+                    // Update chat history if provided
+                    if (data.history) {
+                        updateChatHistory(data.history);
+                    }
                 } else {
                     responseDiv.className = 'response error';
                     responseDiv.innerHTML = 'Error: ' + data.message;
@@ -303,6 +364,58 @@
             const modal = document.getElementById('approvalModal');
             if (event.target === modal) {
                 modal.style.display = 'none';
+            }
+        }
+        
+        async function loadChatHistory() {
+            try {
+                const response = await fetch(`/history/${sessionId}`);
+                const data = await response.json();
+                if (data.success) {
+                    updateChatHistory(data.history);
+                }
+            } catch (error) {
+                console.error('Failed to load chat history:', error);
+            }
+        }
+        
+        function updateChatHistory(history) {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+            
+            history.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.role}-message`;
+                messageDiv.innerHTML = `
+                    <div><strong>${message.role === 'user' ? 'You' : 'AI'}:</strong></div>
+                    <div>${message.content}</div>
+                `;
+                chatContainer.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        async function clearHistory() {
+            if (confirm('Are you sure you want to clear the chat history?')) {
+                try {
+                    const response = await fetch('/clear-history', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ sessionId })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        document.getElementById('chatContainer').innerHTML = '';
+                        alert('Chat history cleared successfully');
+                    }
+                } catch (error) {
+                    console.error('Failed to clear history:', error);
+                    alert('Failed to clear chat history');
+                }
             }
         }
     </script>

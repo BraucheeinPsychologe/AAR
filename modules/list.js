@@ -11,7 +11,7 @@ module.exports = {
         const path = await import('path');
         const modulesPath = path.join(process.cwd(), '..', 'modules');
         const files = fs.readdirSync(modulesPath);
-        const moduleFiles = files.filter(file => file.endsWith('.js'));
+        const moduleFiles = files.filter(file => file.endsWith('.js') || file.endsWith('.mjs'));
         
         const modules = [];
         
@@ -21,9 +21,11 @@ module.exports = {
             const moduleData = await import(modulePath);
             const module = moduleData.default || moduleData;
             
+            // Handle both .js and .mjs extensions
+            const baseName = file.endsWith('.mjs') ? file.slice(0, -4) : file.slice(0, -3);
             const moduleInfo = {
-              name: module.name || file.slice(0, -3),
-              id: module.id || file.slice(0, -3),
+              name: module.name || baseName,
+              id: module.id || baseName,
               capabilities: module.capabilities || [],
               commands: {}
             };
@@ -40,9 +42,11 @@ module.exports = {
             modules.push(moduleInfo);
           } catch (err) {
             console.error(`[ERROR] Failed to load module "${file}":`, err);
+            // Handle both .js and .mjs extensions
+            const baseName = file.endsWith('.mjs') ? file.slice(0, -4) : file.slice(0, -3);
             modules.push({
-              name: file.slice(0, -3),
-              id: file.slice(0, -3),
+              name: baseName,
+              id: baseName,
               capabilities: [],
               commands: {},
               error: "Failed to load module"

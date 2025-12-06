@@ -1,0 +1,6 @@
+🚀 ARR Backend on port 49133
+📦 8 modules loaded
+🤖 Default LLM Service: GEMINI
+🤖 AI Services: Ollama, Gemini, OpenAI ready
+[ROUTE] Message received: test
+[ERROR] Gemini API call failed: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent: [404 Not Found] models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
